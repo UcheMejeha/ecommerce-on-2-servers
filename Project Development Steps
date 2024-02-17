@@ -1,0 +1,33 @@
+Source code available on https://github.com/kodekloudhub/learning-app-ecommerce
+Step 1 --> Let us get some more practice. Let's try to do the same, but in a distributed setup. We will install database on db server, and website on web server. Install mariadb and start the process with default conf. Ensure that process is started on server reboot. Target server: db
+>> ssh db (# to login to db server)
+>> sudo yum install -y mariadb-server (# to install the database server)
+>> sudo systemctl start mariadb (# to start the process)
+>> sudo systemctl enable mariadb (# to ensure that process is started on server reboot)
+Step 2 --> Configure the Database as below. To allow remote connection from any host, we will use the % operator in the host field of the user.
+>> sudo mysql (# command on db server to get into the MYSQL shell)
+In the MYSQL shell run the following commands:
+>> MariaDB > CREATE DATABASE ecomdb; 
+>> MariaDB > CREATE USER '<insert username>' IDENTIFIED BY '<insert password>'; 
+>> MariaDB > GRANT ALL PRIVILEGES ON *.* TO '<insert username>'; 
+>> MariaDB > FLUSH PRIVILEGES;
+Step 3 --> downloaded Product Inventory Information
+store product downloaded Product Inventory Information in directory /opt. Store invetory file as <file_name>.sql
+>>  sudo mysql < /opt/<file_name>.sql
+Step 4 --> now setup the web server. Go to the other server and install the following packages - httpd, php, php-mysqlnd
+>> exit (# exit server db)
+>> sudo yum install -y httpd php php-mysqlnd (# install httpd, php, php-mysqlnd)
+Step 5 --> Make the php page the default page for httpd. Configure httpd for index.php.
+>> sudo sed -i 's/index.html/index.php/g' /etc/httpd/conf/httpd.conf
+Step 6 --> Start and enable the httpd service.
+>> sudo systemctl start httpd; sudo systemctl enable httpd
+Step 7 --> Download code from the git command. Install git if it's not available on the server. GIT repo URL: https://github.com/kodekloudhub/learning-app-ecommerce.git target directory: /var/www/html/
+>> git (# to check if Git is installed)
+>> git version
+>> sudo yum install -y git (# to install git)
+>> sudo git clone https://github.com/kodekloudhub/learning-app-ecommerce.git /var/www/html/ (# to download code source from github)
+Step 8 --> Now point the web server to the database server. Update index.php to replace the default IP address of the database server to point to db.Change 172.20.1.101 to db in index.php file.
+# Use vi editor to update the file OR run sed -i command to update the IP address
+>> sudo sed -i 's/172.20.1.101/db/g' /var/www/html/index.php
+Step 9 --> Test
+>> curl http://localhost
